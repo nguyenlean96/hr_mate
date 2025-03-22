@@ -1,5 +1,6 @@
 import { View, Image, Pressable, Text } from "react-native";
 import Octicons from '@expo/vector-icons/Octicons';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 export default function ScrollCard({ item, wasLiked, handlePressLike }: {
   item: any;
@@ -23,15 +24,31 @@ export default function ScrollCard({ item, wasLiked, handlePressLike }: {
         <View
           style={{
             flexDirection: 'row',
+            alignItems: 'center',
             columnGap: 10
           }}
         >
           {
             item?.jobview?.overview?.squareLogoUrl &&
-            <Image source={{ uri: item?.jobview?.overview?.squareLogoUrl }} style={{ width: 30, height: 30, borderRadius: 4 }} />
+            <Image source={{ uri: item?.jobview?.overview?.squareLogoUrl }}
+              style={{ width: 28, height: 28, borderRadius: 4 }}
+            />
           }
-          <Text>{item?.jobview?.header?.employerNameFromSearch}</Text>
-          <Text>{item?.jobview?.header?.rating}</Text>
+          <Text
+            style={{
+              fontSize: 15,
+            }}
+          >{item?.jobview?.header?.employerNameFromSearch}</Text>
+          <View
+            style={{
+              flexDirection: 'row',
+              columnGap: 5,
+              alignItems: 'center',
+            }}
+          >
+            <Text>{item?.jobview?.header?.rating}</Text>
+            <FontAwesome name="star" size={16} color="black" />
+          </View>
         </View>
         <Pressable
           onPress={() => handlePressLike(item?.jobview?.job?.listingId)}
