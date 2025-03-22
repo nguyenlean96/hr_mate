@@ -38,6 +38,14 @@ export default function Home() {
       setLiked({ type: 'unlike', payload: jobId });
     } else {
       setLiked({ type: 'like', payload: jobId });
+      
+      /**
+       *  Look for the index in the job_posting_examples array:
+       *    to cache the last interaction with the job posting
+       *    which will be scrolled into view after the refresh
+       *    to maintain the user's context
+       */
+      setScrollToIndex(job_posting_examples.findIndex((job) => job?.jobview?.job?.listingId === jobId));
     }
   }
 
