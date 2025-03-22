@@ -1,0 +1,57 @@
+import { View, Image, Pressable, Text } from "react-native";
+import Octicons from '@expo/vector-icons/Octicons';
+
+export default function ScrollCard({ item, wasLiked, handlePressLike }: {
+  item: any;
+  wasLiked: boolean;
+  handlePressLike: (jobId: number) => void;
+}) {
+  return (
+    <View style={{
+      padding: 14,
+      margin: 10,
+      backgroundColor: 'white',
+      borderRadius: 8,
+      rowGap: 10,
+    }}>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+        }}
+      >
+        <View
+          style={{
+            flexDirection: 'row',
+            columnGap: 10
+          }}
+        >
+          {
+            item?.jobview?.overview?.squareLogoUrl &&
+            <Image source={{ uri: item?.jobview?.overview?.squareLogoUrl }} style={{ width: 30, height: 30, borderRadius: 4 }} />
+          }
+          <Text>{item?.jobview?.header?.employerNameFromSearch}</Text>
+          <Text>{item?.jobview?.header?.rating}</Text>
+        </View>
+        <Pressable
+          onPress={() => handlePressLike(item?.jobview?.job?.listingId)}
+        >
+          {
+            wasLiked
+              ?
+              <Octicons name="heart-fill" size={26} />
+              :
+              <Octicons name="heart" size={26} />
+          }
+        </Pressable>
+      </View>
+      <Text
+        style={{
+          fontSize: 18,
+          fontWeight: 'bold',
+        }}
+      >{item?.jobview?.job?.jobTitleText}</Text>
+      <Text>{item?.jobview?.header?.locationName}</Text>
+    </View>
+  )
+}
