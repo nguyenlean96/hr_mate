@@ -36,9 +36,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
   ] = useStorageState('session');
 
   // Handle linking into app from email app.
-  const redirectTo = makeRedirectUri({
-    path: '/signin'
-  });
+  const redirectTo = makeRedirectUri();
   const url = Linking.useURL()
 
   const createSessionFromUrl = async (url: string) => {
@@ -58,18 +56,19 @@ export function SessionProvider({ children }: PropsWithChildren) {
     return data.session
   }
 
-  const { error: oauthGoogleError, oauthWithGoogle } = SupabaseGoogleOauth(
-    redirectTo,
-    createSessionFromUrl,
-  );
+  const { error: oauthGoogleError, oauthWithGoogle } = SupabaseGoogleOauth(redirectTo);
   const { sendAuthEmailOtp } = SupabaseEmailOtpAuth(redirectTo);
 
   if (url) createSessionFromUrl(url)
   useEffect(() => {
-    if (session) {
-      router.replace('/(auth)/home')
+    if (sessionLoading) {
+      router.replace('/')
     } else {
-      router.replace('/signin')
+      if (session) {
+        router.replace('/(auth)/home')
+      } else {
+        router.replace('/signin')
+      }
     }
   }, [session]);
 
