@@ -1,0 +1,127 @@
+import React, { useState, useCallback } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  SafeAreaView,
+  Dimensions,
+} from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  useDerivedValue,
+  interpolate,
+  Extrapolation,
+  runOnJS,
+} from 'react-native-reanimated';
+import Interactable from './Interactable';
+import Card from './Card';
+import { Profile } from './Model';
+
+const { width, height } = Dimensions.get('window');
+const φ = (1 / 2) + (Math.sqrt(5) / 2);
+const deltaX = width / 2;
+const w = width - 32;
+const h = w * φ;
+const α = Math.PI / 12;
+const A = width * Math.cos(α) + height * Math.sin(α);
+
+interface ProfilesProps {
+  profiles: Profile[];
+}
+
+const Profiles: React.FC<ProfilesProps> = ({ profiles }) => {
+  const [index, setIndex] = useState(0);
+  const x = useSharedValue(0);
+  const y = useSharedValue(0);
+
+  const onSnap = useCallback((snapPoint: number) => {
+    if (snapPoint !== 0) {
+      setIndex((prevIndex) => prevIndex + 1);
+    }
+  }, []);
+
+  const animatedStyle = useAnimatedStyle(() => {
+    const rotateZ = `${interpolate(
+      x.value,
+      [-deltaX, deltaX],
+      [α, -α],
+      { extrapolateLeft: Extrapolation.CLAMP, extrapolateRight: Extrapolation.CLAMP }
+    )}rad`;
+
+    return {
+      ...StyleSheet.absoluteFillObject,
+      transform: [
+        { translateX: x.value },
+        { translateY: y.value },
+        { rotateZ },
+      ],
+    };
+  });
+
+  const likeOpacity = useDerivedValue(() => interpolate(x.value, [0, deltaX / 4], [0, 1]));
+  const nopeOpacity = useDerivedValue(() => interpolate(x.value, [-deltaX / 4, 0], [1, 0]));
+
+  const profile = profiles[index];
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <View style={styles.cards}>
+        <Animated.View style={animatedStyle}>
+          <Card
+            profile={profile}
+            likeOpacity={likeOpacity}
+            nopeOpacity={nopeOpacity}
+          />
+        </Animated.View>
+        <Interactable
+          key={index}
+          snapPoints={[{ x: -A }, { x: 0 }, { x: A }]}
+          style={{ ...StyleSheet.absoluteFillObject }}
+          onSnap={(point) => runOnJS(onSnap)(point)}
+        />
+      </View>
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fbfaff',
+    justifyContent: 'space-evenly',
+    paddingVertical: 32,
+  },
+  header: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 16,
+  },
+  cards: {
+    width: w,
+    height: h,
+    marginLeft: 16,
+  },
+  footer: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    padding: 16,
+  },
+  circle: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    padding: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    shadowColor: 'gray',
+    shadowOffset: { width: 1, height: 1 },
+    shadowOpacity: 0.18,
+    shadowRadius: 2,
+  },
+});
+
+export default Profiles;
