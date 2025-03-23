@@ -93,8 +93,10 @@ export default function Home() {
             />
             :
             <View>
-              <Profiles 
+              <Profiles
                 profiles={job_posting_examples}
+                handlePressLike={handlePressLike}
+                liked={liked}
               />
             </View>
         }
