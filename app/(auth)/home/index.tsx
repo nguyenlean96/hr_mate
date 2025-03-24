@@ -1,11 +1,9 @@
 import {
   useState,
   useReducer,
-  useEffect
 } from 'react';
 import {
   View,
-  Text,
   Pressable,
 } from 'react-native';
 
