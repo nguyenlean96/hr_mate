@@ -38,12 +38,12 @@ const Profiles: React.FC<ProfilesProps> = ({ profiles }) => {
 
   const onSnap = useCallback((snapPoint: number) => {
     if (snapPoint !== 0) {
-      setIndex((prevIndex) => prevIndex + 1);
+      setIndex((prevIndex: number) => ((prevIndex + 1) % profiles.length));
 
       translationX.value = 0;
       translationY.value = 0;
     }
-  }, [translationX, translationY]);
+  }, [index, profiles, translationX, translationY]);
 
   const animatedStyle = useAnimatedStyle(() => {
     const rotateZ = `${interpolate(
