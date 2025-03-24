@@ -1,6 +1,8 @@
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { Drawer } from 'expo-router/drawer';
-import { Stack } from 'expo-router';
+import { Stack, Tabs } from 'expo-router';
+import Octicons from '@expo/vector-icons/Octicons';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
 export default function Layout() {
   return (
@@ -11,20 +13,29 @@ export default function Layout() {
         }}
       />
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <Drawer>
-          <Drawer.Screen
+        <Tabs>
+          <Tabs.Screen
             name="home/index"
             options={{
-              title: 'Home',
+              title: 'Jobs',
+              tabBarIcon: ({ color }) => <Ionicons name="business" size={24} color={color} />,
             }}
           />
-          <Drawer.Screen
-            name="account/index"
+          <Tabs.Screen
+            name='saved/index'
             options={{
-              title: 'Account',
+              title: 'Saved',
+              tabBarIcon: ({ color }) => <Octicons name="heart-fill" size={24} color={color} />,
             }}
           />
-        </Drawer>
+          <Tabs.Screen
+            name='account/index'
+            options={{
+              title: 'Profile',
+              tabBarIcon: ({ color }) => <MaterialCommunityIcons name="account-circle-outline" size={24} color={color} />,
+            }}
+          />
+        </Tabs>
       </GestureHandlerRootView>
     </>
   );
