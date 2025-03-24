@@ -1,12 +1,15 @@
+import React from "react";
 import { View, Image, Pressable, Text } from "react-native";
 import Octicons from '@expo/vector-icons/Octicons';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 
-export default function ScrollCard({ item, wasLiked, handlePressLike }: {
+interface ScrollCardProps {
   item: any;
   wasLiked: boolean;
   handlePressLike: (jobId: number) => void;
-}) {
+}
+
+const ScrollCard: React.FC<ScrollCardProps> = ({ item, wasLiked, handlePressLike }) => {
   return (
     <View style={{
       padding: 14,
@@ -72,3 +75,5 @@ export default function ScrollCard({ item, wasLiked, handlePressLike }: {
     </View>
   )
 }
+
+export default ScrollCard;

@@ -1,21 +1,19 @@
-import { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { FlashList } from "@shopify/flash-list";
 import { RefreshControl } from 'react-native-gesture-handler';
-import ScrollCard from './card';
+import ScrollCard from './ScrollCard';
 
-export default function JobsList(
-  {
-    jobs_list,
-    handlePressLike,
-    liked,
-  }: {
-    jobs_list: any[];
-    handlePressLike: (
-      jobId: number,
-      cb?: () => void
-    ) => void;
-    liked: Set<number>;
-  }) {
+
+interface JobsListProps {
+  jobs_list: any[];
+  handlePressLike: (
+    jobId: number,
+    cb?: () => void
+  ) => void;
+  liked: Set<number>;
+}
+
+const JobsList: React.FC<JobsListProps> = ({ jobs_list, handlePressLike, liked }) => {
   const scrollRef = useRef(null);
   const [refreshing, setRefreshing] = useState(false);
   const [scrollToIndex, setScrollToIndex] = useState(0);
@@ -86,3 +84,5 @@ export default function JobsList(
     />
   )
 }
+
+export default JobsList;
