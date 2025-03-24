@@ -1,7 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import {
   View,
-  Text,
   StyleSheet,
   SafeAreaView,
   Dimensions,
@@ -19,7 +18,7 @@ import Card from './Card';
 import { Profile } from './Model';
 
 const { width, height } = Dimensions.get('window');
-const φ = (1 / 2) + (Math.sqrt(5) / 2);
+const φ = (1 + Math.sqrt(5)) / 2;
 const deltaX = width / 2;
 const w = width - 32;
 const h = w * φ;
@@ -31,19 +30,24 @@ interface ProfilesProps {
 }
 
 const Profiles: React.FC<ProfilesProps> = ({ profiles }) => {
-  const [index, setIndex] = useState(0);
-  const x = useSharedValue(0);
-  const y = useSharedValue(0);
+  const [index, setIndex] = useState<number>(0);
+
+  // Create shared values here:
+  const translationX = useSharedValue(0);
+  const translationY = useSharedValue(0);
 
   const onSnap = useCallback((snapPoint: number) => {
     if (snapPoint !== 0) {
       setIndex((prevIndex) => prevIndex + 1);
+
+      translationX.value = 0;
+      translationY.value = 0;
     }
-  }, []);
+  }, [translationX, translationY]);
 
   const animatedStyle = useAnimatedStyle(() => {
     const rotateZ = `${interpolate(
-      x.value,
+      translationX.value,
       [-deltaX, deltaX],
       [α, -α],
       { extrapolateLeft: Extrapolation.CLAMP, extrapolateRight: Extrapolation.CLAMP }
@@ -52,15 +56,19 @@ const Profiles: React.FC<ProfilesProps> = ({ profiles }) => {
     return {
       ...StyleSheet.absoluteFillObject,
       transform: [
-        { translateX: x.value },
-        { translateY: y.value },
+        { translateX: translationX.value },
+        { translateY: translationY.value },
         { rotateZ },
       ],
     };
   });
 
-  const likeOpacity = useDerivedValue(() => interpolate(x.value, [0, deltaX / 4], [0, 1]));
-  const nopeOpacity = useDerivedValue(() => interpolate(x.value, [-deltaX / 4, 0], [1, 0]));
+  const likeOpacity = useDerivedValue(() =>
+    interpolate(translationX.value, [0, deltaX / 4], [0, 1])
+  );
+  const nopeOpacity = useDerivedValue(() =>
+    interpolate(translationX.value, [-deltaX / 4, 0], [1, 0])
+  );
 
   const profile = profiles[index];
 
@@ -78,7 +86,9 @@ const Profiles: React.FC<ProfilesProps> = ({ profiles }) => {
           key={index}
           snapPoints={[{ x: -A }, { x: 0 }, { x: A }]}
           style={{ ...StyleSheet.absoluteFillObject }}
-          onSnap={(point) => runOnJS(onSnap)(point)}
+          translationX={translationX}
+          translationY={translationY}
+          onSnap={onSnap}
         />
       </View>
     </SafeAreaView>
