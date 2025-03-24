@@ -1,10 +1,10 @@
 import { ViewStyle } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
-  useSharedValue,
   useAnimatedStyle,
   withSpring,
   runOnJS,
+  SharedValue,
 } from 'react-native-reanimated';
 
 export const findNearestSnapPoint = (
@@ -19,15 +19,21 @@ export const findNearestSnapPoint = (
   return snapPoints[nearestPointIndex];
 };
 
-
-const Interactable = ({ snapPoints, onSnap, style }: {
+interface InteractableProps {
   snapPoints: { x: number }[],
   onSnap: (point: number) => void,
-  style: ViewStyle
-}) => {
-  const translationX = useSharedValue(0);
-  const translationY = useSharedValue(0);
+  style: ViewStyle,
+  translationX: SharedValue<number>,
+  translationY: SharedValue<number>
+}
 
+const Interactable: React.FC<InteractableProps> = ({
+  snapPoints,
+  onSnap,
+  style,
+  translationX,
+  translationY,
+}) => {
   const panGesture = Gesture.Pan()
     .onUpdate((event) => {
       translationX.value = event.translationX;
@@ -39,7 +45,9 @@ const Interactable = ({ snapPoints, onSnap, style }: {
         event.velocityX,
         snapPoints.map(p => p.x)
       );
-      translationX.value = withSpring(snapTo, {}, () => { runOnJS(onSnap)(snapTo); });
+      translationX.value = withSpring(snapTo, {}, () => {
+        runOnJS(onSnap)(snapTo);
+      });
       translationY.value = withSpring(0);
     });
 
