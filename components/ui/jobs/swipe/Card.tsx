@@ -11,6 +11,7 @@ import Animated,
   useAnimatedStyle,
   SharedValue
 } from 'react-native-reanimated';
+import Octicons from '@expo/vector-icons/Octicons';
 import { Profile } from './Model';
 
 const { width } = Dimensions.get('window');
@@ -34,10 +35,12 @@ const Card: React.FC<CardProps> = ({ profile, likeOpacity, nopeOpacity }) => {
       <View style={styles.overlay}>
         <View style={styles.header}>
           <Animated.View style={[styles.like, likeStyle]}>
-            <Text style={styles.likeLabel}>LIKE</Text>
+            <Octicons name="heart-fill" size={26} color={styles.like.color} />
+            <Text style={styles.likeLabel}>SAVE</Text>
           </Animated.View>
           <Animated.View style={[styles.nope, nopeStyle]}>
-            <Text style={styles.nopeLabel}>NOPE</Text>
+            <Octicons name="circle-slash" size={24} color={styles.nope.color} />
+            <Text style={styles.nopeLabel}>SKIP</Text>
           </Animated.View>
         </View>
         <View style={styles.footer}>
@@ -83,7 +86,13 @@ const styles = StyleSheet.create({
   },
   like: {
     borderWidth: 4,
-    borderRadius: 5, padding: 8, borderColor: '#6ee3b4',
+    borderRadius: 5, 
+    padding: 8, 
+    borderColor: '#6ee3b4',
+    color: '#6ee3b4',
+    flexDirection: 'row',
+    alignItems: 'center',
+    columnGap: 5,
   },
   likeLabel: {
     fontSize: 32,
@@ -95,6 +104,10 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 8,
     borderColor: '#ec5288',
+    color: '#ec5288',
+    flexDirection: 'row',
+    alignItems: 'center',
+    columnGap: 5,
   },
   nopeLabel: {
     fontSize: 32,
