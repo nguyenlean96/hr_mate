@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   View,
   StyleSheet,
@@ -11,11 +11,11 @@ import Animated, {
   useDerivedValue,
   interpolate,
   Extrapolation,
+  withSpring,
   runOnJS,
 } from 'react-native-reanimated';
 import Interactable from './Interactable';
 import Card from './Card';
-import { Profile } from './Model';
 
 const { width, height } = Dimensions.get('window');
 const φ = (1 + Math.sqrt(5)) / 2;
@@ -43,6 +43,17 @@ const Profiles: React.FC<ProfilesProps> = ({
   const translationX = useSharedValue(0);
   const translationY = useSharedValue(0);
 
+  // New shared value for the entrance animation offset:
+  const entranceOffset = useSharedValue(100);
+
+  // Animate entrance offset when the card index changes:
+  useEffect(() => {
+    // Set the card to start from 100 (or any value you prefer)
+    entranceOffset.value = 100;
+    // Animate it to 0 so it slides in from the bottom:
+    entranceOffset.value = withSpring(0, { damping: 15, stiffness: 100 });
+  }, [index]);
+
   const onSnap = useCallback((snapPoint: number) => {
     if (snapPoint !== 0) {
       /**
@@ -69,7 +80,8 @@ const Profiles: React.FC<ProfilesProps> = ({
       ...StyleSheet.absoluteFillObject,
       transform: [
         { translateX: translationX.value },
-        { translateY: translationY.value },
+        // Combine gesture translateY with the entrance offset:
+        { translateY: translationY.value + entranceOffset.value },
         { rotateZ },
       ],
     };
