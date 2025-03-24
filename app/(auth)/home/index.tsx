@@ -1,11 +1,21 @@
-import { useRef, useState, useReducer, useEffect } from 'react';
+import {
+  useState,
+  useReducer,
+  useEffect
+} from 'react';
 import {
   View,
+  Text,
+  Pressable,
 } from 'react-native';
-import { FlashList } from "@shopify/flash-list";
+
 import { job_posting_examples } from '@/constants/job_posting_example';
-import { RefreshControl } from 'react-native-gesture-handler';
-import ScrollCard from '@/components/ui/jobs/scroll/card';
+import JobsList from '@/components/ui/jobs/scroll/List';
+import { Stack } from 'expo-router';
+import Entypo from '@expo/vector-icons/Entypo';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import Profiles from '@/components/ui/jobs/swipe/Profiles';
+
 
 function handleLike(
   state: Set<number>,
@@ -24,81 +34,73 @@ function handleLike(
 }
 
 export default function Home() {
-  const scrollRef = useRef(null);
-  const [refreshing, setRefreshing] = useState(false);
-  const [scrollToIndex, setScrollToIndex] = useState(0);
-
+  const [showList, setShowList] = useState(true);
   const [liked, setLiked] = useReducer(
     handleLike,
     new Set<number>()
   )
 
-  function handlePressLike(jobId: number) {
+  function handlePressLike(
+    jobId: number,
+    // Optional callback
+    cb?: () => void
+  ) {
     if (liked.has(jobId)) {
       setLiked({ type: 'unlike', payload: jobId });
     } else {
       setLiked({ type: 'like', payload: jobId });
-      
-      /**
-       *  Look for the index in the job_posting_examples array:
-       *    to cache the last interaction with the job posting
-       *    which will be scrolled into view after the refresh
-       *    to maintain the user's context
-       */
-      setScrollToIndex(job_posting_examples.findIndex((job) => job?.jobview?.job?.listingId === jobId));
+
+      if (cb) {
+        cb();
+      }
     }
   }
-
-  const handleScrollToIndex = (index: number) => {
-    if (scrollRef.current) {
-      (scrollRef.current as any)
-        .scrollToItem({
-          item: job_posting_examples[index],
-          animated: true,
-        })
-    }
-  }
-
-  useEffect(() => {
-    if (!refreshing) {
-      handleScrollToIndex(scrollToIndex)
-    }
-  }, [refreshing])
 
   return (
-    <View style={{
-      flex: 1,
-    }}>
-      <FlashList
-        ref={scrollRef}
-        initialScrollIndex={scrollToIndex}
-        style={{
-          flex: 1,
+    <>
+      <Stack.Screen
+        options={{
+          headerRight: () => (
+            <Pressable
+              onPress={() => setShowList(!showList)}
+            >
+              <View
+                style={{
+                  padding: 10,
+                  marginRight: 10
+                }}
+              >
+                {
+                  showList ?
+                    <Entypo name="list" size={24} color="black" />
+                    :
+                    <MaterialCommunityIcons name="cards-variant" size={24} color="black" />
+                }
+              </View>
+            </Pressable>
+          )
         }}
-        data={refreshing ? [] : job_posting_examples}
-        renderItem={({ item, index }) => (
-          <ScrollCard
-            item={item}
-            handlePressLike={handlePressLike}
-            wasLiked={liked.has(item?.jobview?.job?.listingId)}
-          />
-        )}
-        keyExtractor={(item) => item?.jobview?.job?.listingId.toString()}
-        extraData={liked}
-        refreshing={refreshing}
-        refreshControl={
-          <RefreshControl refreshing={refreshing}
-            onRefresh={() => {
-              setRefreshing(true);
-              setTimeout(() => {
-                setRefreshing(false);
-              },
-                100
-              )
-            }}
-          />
-        }
       />
-    </View>
+      <View style={{
+        flex: 1,
+      }}>
+        {
+          showList ?
+            <JobsList
+              jobs_list={job_posting_examples}
+              handlePressLike={handlePressLike}
+              liked={liked}
+            />
+            :
+            <View>
+              <Profiles
+                profiles={job_posting_examples}
+                handlePressLike={handlePressLike}
+                liked={liked}
+              />
+            </View>
+        }
+      </View>
+    </>
   )
 }
