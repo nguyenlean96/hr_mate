@@ -2,27 +2,20 @@ import React, { useRef, useState, useEffect } from 'react';
 import { FlashList } from "@shopify/flash-list";
 import { RefreshControl } from 'react-native-gesture-handler';
 import ScrollCard from './ScrollCard';
+import { useAppData } from '@/contexts/app_data';
 
 
-interface JobsListProps {
-  jobs_list: any[];
-  handlePressLike: (
-    jobId: number,
-    cb?: () => void
-  ) => void;
-  liked: Set<number>;
-}
-
-const JobsList: React.FC<JobsListProps> = ({ jobs_list, handlePressLike, liked }) => {
+const JobsList: React.FC = () => {
   const scrollRef = useRef(null);
+  const { data: jobs_data, liked, handlePressLike } = useAppData();
   const [refreshing, setRefreshing] = useState(false);
   const [scrollToIndex, setScrollToIndex] = useState(0);
 
   const handleScrollToIndex = (index: number) => {
-    if (scrollRef.current) {
+    if (scrollRef.current && jobs_data) {
       (scrollRef.current as any)
         .scrollToItem({
-          item: jobs_list[index],
+          item: jobs_data[index],
           animated: true,
         })
     }
@@ -37,9 +30,9 @@ const JobsList: React.FC<JobsListProps> = ({ jobs_list, handlePressLike, liked }
        *    to maintain the user's context
        */
       setScrollToIndex(
-        jobs_list
+        jobs_data
           .findIndex(
-            (job) => (job?.jobview?.job?.listingId === jobId)
+            (job: any) => (job?.jobview?.job?.listingId === jobId)
           )
       );
     })
@@ -58,11 +51,10 @@ const JobsList: React.FC<JobsListProps> = ({ jobs_list, handlePressLike, liked }
       style={{
         flex: 1,
       }}
-      data={jobs_list}
+      data={jobs_data}
       renderItem={({ item, index }: { item: any; index: number }) => (
         <ScrollCard
           item={item}
-          handlePressLike={handleLike}
           wasLiked={liked.has(item?.jobview?.job?.listingId)}
         />
       )}

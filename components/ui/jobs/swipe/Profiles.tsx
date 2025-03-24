@@ -16,6 +16,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import Interactable from './Interactable';
 import Card from './Card';
+import { useAppData } from '@/contexts/app_data';
 
 const { width, height } = Dimensions.get('window');
 const φ = (1 + Math.sqrt(5)) / 2;
@@ -25,18 +26,9 @@ const h = w * φ;
 const α = Math.PI / 12;
 const A = width * Math.cos(α) + height * Math.sin(α);
 
-interface ProfilesProps {
-  profiles: any[];
-  liked: Set<number>;
-  handlePressLike: (jobId: number, cb?: () => void) => void;
-}
 
-
-const Profiles: React.FC<ProfilesProps> = ({
-  profiles,
-  liked,
-  handlePressLike,
-}) => {
+const Profiles: React.FC = () => {
+  const { data: jobs_data, liked, handlePressLike } = useAppData();
   const [index, setIndex] = useState<number>(0);
 
   // Create shared values here:
@@ -59,14 +51,22 @@ const Profiles: React.FC<ProfilesProps> = ({
       /**
        *  Set the remainder to infinitly loop through the profiles
        */
-      setIndex((prevIndex: number) => ((prevIndex + 1) % profiles.length));
+      setIndex((prevIndex: number) => ((prevIndex + 1) % jobs_data.length));
 
-      runOnJS(handlePressLike)(profiles[index].jobview.job.listingId);
+      if (liked.has(jobs_data[index].jobview.job.listingId)) {
+        if (snapPoint < 0) {
+          runOnJS(handlePressLike)(jobs_data[index].jobview.job.listingId);
+        }
+      } else {
+        if (snapPoint > 0) {
+          runOnJS(handlePressLike)(jobs_data[index].jobview.job.listingId);
+        }
+      }
 
       translationX.value = 0;
       translationY.value = 0;
     }
-  }, [index, profiles, liked, handlePressLike, translationX, translationY]);
+  }, [index, jobs_data, liked, handlePressLike, translationX, translationY]);
 
   const animatedStyle = useAnimatedStyle(() => {
     const rotateZ = `${interpolate(
@@ -94,7 +94,7 @@ const Profiles: React.FC<ProfilesProps> = ({
     interpolate(translationX.value, [-deltaX / 4, 0], [1, 0])
   );
 
-  const profile = profiles[index];
+  const profile = jobs_data[index];
 
   return (
     <SafeAreaView style={styles.container}>

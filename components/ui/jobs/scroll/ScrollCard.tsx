@@ -2,14 +2,15 @@ import React from "react";
 import { View, Image, Pressable, Text } from "react-native";
 import Octicons from '@expo/vector-icons/Octicons';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { useAppData } from "@/contexts/app_data";
 
 interface ScrollCardProps {
   item: any;
   wasLiked: boolean;
-  handlePressLike: (jobId: number) => void;
 }
 
-const ScrollCard: React.FC<ScrollCardProps> = ({ item, wasLiked, handlePressLike }) => {
+const ScrollCard: React.FC<ScrollCardProps> = ({ item, wasLiked }) => {
+  const { handlePressLike } = useAppData();
   return (
     <View style={{
       padding: 14,
