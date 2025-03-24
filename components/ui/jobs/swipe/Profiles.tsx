@@ -26,10 +26,17 @@ const α = Math.PI / 12;
 const A = width * Math.cos(α) + height * Math.sin(α);
 
 interface ProfilesProps {
-  profiles: Profile[];
+  profiles: any[];
+  liked: Set<number>;
+  handlePressLike: (jobId: number, cb?: () => void) => void;
 }
 
-const Profiles: React.FC<ProfilesProps> = ({ profiles }) => {
+
+const Profiles: React.FC<ProfilesProps> = ({
+  profiles,
+  liked,
+  handlePressLike,
+}) => {
   const [index, setIndex] = useState<number>(0);
 
   // Create shared values here:
@@ -38,12 +45,17 @@ const Profiles: React.FC<ProfilesProps> = ({ profiles }) => {
 
   const onSnap = useCallback((snapPoint: number) => {
     if (snapPoint !== 0) {
+      /**
+       *  Set the remainder to infinitly loop through the profiles
+       */
       setIndex((prevIndex: number) => ((prevIndex + 1) % profiles.length));
+
+      runOnJS(handlePressLike)(profiles[index].jobview.job.listingId);
 
       translationX.value = 0;
       translationY.value = 0;
     }
-  }, [index, profiles, translationX, translationY]);
+  }, [index, profiles, liked, handlePressLike, translationX, translationY]);
 
   const animatedStyle = useAnimatedStyle(() => {
     const rotateZ = `${interpolate(
@@ -98,15 +110,8 @@ const Profiles: React.FC<ProfilesProps> = ({ profiles }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fbfaff',
     justifyContent: 'space-evenly',
     paddingVertical: 32,
-  },
-  header: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: 16,
   },
   cards: {
     width: w,
