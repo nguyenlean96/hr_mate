@@ -31,10 +31,9 @@ export default function Home() {
                 }}
               >
                 {
-                  showList ?
-                    <Entypo name="list" size={24} color="black" />
-                    :
-                    <MaterialCommunityIcons name="cards-variant" size={24} color="black" />
+                  showList
+                    ? <MaterialCommunityIcons name="cards-variant" size={24} color="black" />
+                    : <Entypo name="list" size={24} color="black" />
                 }
               </View>
             </Pressable>

@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import {
   View,
+  Text,
   StyleSheet,
   SafeAreaView,
   Dimensions,
@@ -14,9 +15,10 @@ import Animated, {
   withSpring,
   runOnJS,
 } from 'react-native-reanimated';
+import Octicons from '@expo/vector-icons/Octicons';
+import { useAppData } from '@/contexts/app_data';
 import Interactable from './Interactable';
 import Card from './Card';
-import { useAppData } from '@/contexts/app_data';
 
 const { width, height } = Dimensions.get('window');
 const φ = (1 + Math.sqrt(5)) / 2;
@@ -51,15 +53,15 @@ const Profiles: React.FC = () => {
       /**
        *  Set the remainder to infinitly loop through the profiles
        */
-      setIndex((prevIndex: number) => ((prevIndex + 1) % jobs_data.length));
+      setIndex((prevIndex: number) => ((prevIndex + 1) % Object.keys(jobs_data).length));
 
-      if (liked.has(jobs_data[index].jobview.job.listingId)) {
+      if (liked.has(jobs_data[Object.keys(jobs_data)[index]].jobview.job.listingId)) {
         if (snapPoint < 0) {
-          runOnJS(handlePressLike)(jobs_data[index].jobview.job.listingId);
+          runOnJS(handlePressLike)(jobs_data[Object.keys(jobs_data)[index]].jobview.job.listingId);
         }
       } else {
         if (snapPoint > 0) {
-          runOnJS(handlePressLike)(jobs_data[index].jobview.job.listingId);
+          runOnJS(handlePressLike)(jobs_data[Object.keys(jobs_data)[index]].jobview.job.listingId);
         }
       }
 
@@ -93,8 +95,11 @@ const Profiles: React.FC = () => {
   const nopeOpacity = useDerivedValue(() =>
     interpolate(translationX.value, [-deltaX / 4, 0], [1, 0])
   );
+  const likeStyle = useAnimatedStyle(() => ({ opacity: likeOpacity.value, }));
 
-  const profile = jobs_data[index];
+  const nopeStyle = useAnimatedStyle(() => ({ opacity: nopeOpacity.value, }));
+
+  const profile = jobs_data[Object.keys(jobs_data)[index]];
 
   return (
     <SafeAreaView style={styles.container}>
@@ -115,6 +120,23 @@ const Profiles: React.FC = () => {
           onSnap={onSnap}
         />
       </View>
+      {/* Absolute indicator wrappers */}
+      <View style={[styles.indicatorWrapper, { zIndex: 10 }]}>
+        <Animated.View style={likeStyle}>
+          <View style={styles.like}>
+            <Octicons name="heart-fill" size={26} color="#4aa1ff" />
+            <Text style={styles.likeLabel}>SAVE</Text>
+          </View>
+        </Animated.View>
+      </View>
+      <View style={[styles.indicatorWrapper, { zIndex: 5 }]}>
+        <Animated.View style={nopeStyle}>
+          <View style={styles.nope}>
+            <Octicons name="circle-slash" size={24} color="#ec5288" />
+            <Text style={styles.nopeLabel}>SKIP</Text>
+          </View>
+        </Animated.View>
+      </View>
     </SafeAreaView>
   );
 };
@@ -124,6 +146,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'space-evenly',
     paddingVertical: 32,
+    backgroundColor: '#eee',
   },
   cards: {
     width: w,
@@ -136,18 +159,43 @@ const styles = StyleSheet.create({
     justifyContent: 'space-evenly',
     padding: 16,
   },
-  circle: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    padding: 12,
+  // New style for each indicator wrapper:
+  indicatorWrapper: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'white',
-    shadowColor: 'gray',
-    shadowOffset: { width: 1, height: 1 },
-    shadowOpacity: 0.18,
-    shadowRadius: 2,
+  },
+  like: {
+    padding: 6,
+    borderColor: '#4aa1ff',
+    color: '#4aa1ff',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    rowGap: 5,
+  },
+  likeLabel: {
+    fontSize: 32,
+    color: '#4aa1ff',
+    fontWeight: 'bold',
+  },
+  nope: {
+    padding: 6,
+    borderColor: '#ec5288',
+    color: '#ec5288',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    rowGap: 5,
+  },
+  nopeLabel: {
+    fontSize: 32,
+    color: '#ec5288',
+    fontWeight: 'bold',
   },
 });
 

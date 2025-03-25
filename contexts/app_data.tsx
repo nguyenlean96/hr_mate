@@ -37,7 +37,32 @@ function handleLike(
 }
 
 export function AppDataProvider({ children }: PropsWithChildren) {
-  const data = job_posting_examples;
+  /**
+   *  Map data and get all ids (job.listingId) set as keys
+   *  jobview: {
+   *    overview: {
+   *    squareLogoUrl: string;
+   *  };
+   *  header: {
+   *    employerNameFromSearch: string;
+   *    rating: number;
+   *    locationName: string;
+   *  };
+   *  job: {
+   *      listingId: number;
+   *      jobTitleText: string;
+   *    }
+   *  };
+   */
+  const data = job_posting_examples
+    .map((job) => job.jobview.job.listingId)
+    .reduce((acc: any, id) => {
+      acc[id] = job_posting_examples.find(
+        (job) => job.jobview.job.listingId === id
+      );
+      return acc;
+    }, {});
+
   const [liked, setLiked] = useReducer(
     handleLike,
     new Set<number>()

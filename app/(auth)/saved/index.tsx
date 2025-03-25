@@ -1,11 +1,13 @@
-import { useAppData } from '@/contexts/app_data'
 import React from 'react'
+import { useAppData } from '@/contexts/app_data'
 import { View, Text } from 'react-native'
 import { FlashList } from "@shopify/flash-list";
 import { RefreshControl } from 'react-native-gesture-handler';
+import SavedJobCard from '@/components/ui/jobs/saved/Card';
 
-export default function SavedJobsScreen() {
-  const { liked, data: jobs_data } = useAppData()
+
+const SavedJobsScreen: React.FC = () => {
+  const { liked }: { liked: Set<number>, } = useAppData()
   return (
     <View style={{
       flex: 1,
@@ -15,17 +17,13 @@ export default function SavedJobsScreen() {
           flex: 1,
           borderWidth: 1,
         }}
-        data={Array.from(liked)}
+        data={Array.from(liked) as number[]}
         renderItem={({ item }) => (
-          <Text>{
-            jobs_data.find(
-              (job: any) => (job?.jobview?.job?.listingId === item)
-            ).jobview.header.employerNameFromSearch
-          }</Text>
+          <SavedJobCard item={item} />
         )}
         ListEmptyComponent={() => (
           <View style={{ alignItems: 'center', marginTop: 20 }}>
-            <Text style={{ fontSize: 16, fontWeight: 500, fontStyle: 'italic', color: '#aaa' }}>No saved jobs</Text>
+            <Text style={{ fontSize: 16, fontWeight: 500, fontStyle: 'italic', color: '#aaa' }}>No jobs found</Text>
           </View>
         )}
         refreshControl={
@@ -38,3 +36,5 @@ export default function SavedJobsScreen() {
     </View>
   )
 }
+
+export default SavedJobsScreen

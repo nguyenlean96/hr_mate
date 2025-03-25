@@ -21,23 +21,6 @@ const JobsList: React.FC = () => {
     }
   }
 
-  const handleLike = (jobId: number) => {
-    handlePressLike(jobId, () => {
-      /**
-       *  Look for the index in the jobs_list array:
-       *    to cache the last interaction with the job posting
-       *    which will be scrolled into view after the refresh
-       *    to maintain the user's context
-       */
-      setScrollToIndex(
-        jobs_data
-          .findIndex(
-            (job: any) => (job?.jobview?.job?.listingId === jobId)
-          )
-      );
-    })
-  }
-
   useEffect(() => {
     if (!refreshing) {
       handleScrollToIndex(scrollToIndex)
@@ -51,14 +34,16 @@ const JobsList: React.FC = () => {
       style={{
         flex: 1,
       }}
-      data={jobs_data}
+      data={
+        Object.values(jobs_data)
+      }
       renderItem={({ item, index }: { item: any; index: number }) => (
         <ScrollCard
           item={item}
           wasLiked={liked.has(item?.jobview?.job?.listingId)}
         />
       )}
-      keyExtractor={(item) => item?.jobview?.job?.listingId.toString()}
+      keyExtractor={(item: any) => item?.jobview?.job?.listingId.toString()}
       extraData={liked}
       refreshing={refreshing}
       refreshControl={
