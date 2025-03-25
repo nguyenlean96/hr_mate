@@ -70,7 +70,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
         router.replace('/signin')
       }
     }
-  }, [session]);
+  }, [session, sessionLoading]);
 
   useEffect(() => {
     const handleDeepLink = async (event: any) => {
