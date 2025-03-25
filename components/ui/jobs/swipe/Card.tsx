@@ -11,9 +11,8 @@ import Animated,
   useAnimatedStyle,
   SharedValue
 } from 'react-native-reanimated';
-import Octicons from '@expo/vector-icons/Octicons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Profile } from './Model';
-
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width - 32;
 const CARD_HEIGHT = CARD_WIDTH * (1 + Math.sqrt(5)) / 2;
@@ -25,30 +24,26 @@ interface CardProps {
 }
 
 const Card: React.FC<CardProps> = ({ profile, likeOpacity, nopeOpacity }) => {
-  const likeStyle = useAnimatedStyle(() => ({ opacity: likeOpacity.value, }));
-
-  const nopeStyle = useAnimatedStyle(() => ({ opacity: nopeOpacity.value, }));
 
   return (
     <View style={styles.container}>
       <Image style={styles.image} source={{ uri: profile?.jobview?.overview?.squareLogoUrl as string }} />
       <View style={styles.overlay}>
-        <View style={styles.header}>
-          <Animated.View style={[styles.like, likeStyle]}>
-            <Octicons name="heart-fill" size={26} color={styles.like.color} />
-            <Text style={styles.likeLabel}>SAVE</Text>
-          </Animated.View>
-          <Animated.View style={[styles.nope, nopeStyle]}>
-            <Octicons name="circle-slash" size={24} color={styles.nope.color} />
-            <Text style={styles.nopeLabel}>SKIP</Text>
-          </Animated.View>
-        </View>
-        <View style={styles.footer}>
+        <LinearGradient
+          style={styles.header}
+          colors={['rgba(0,0,0,0.4)', 'rgba(0,0,0,0)']}
+        >
+          <Text style={styles.companyName}>{profile?.jobview?.header?.employerNameFromSearch}</Text>
+          <Text style={styles.companyLocation}>{profile?.jobview?.header?.locationName}</Text>
+        </LinearGradient>
+        <LinearGradient
+          style={styles.footer}
+          colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.4)']}
+        >
           <Text
-            style={styles.name}
+            style={styles.jobTitle}
           >{profile?.jobview?.job?.jobTitleText}</Text>
-          <Text>{profile?.jobview?.header?.locationName}</Text>
-        </View>
+        </LinearGradient>
       </View>
     </View>
   );
@@ -61,8 +56,17 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     overflow: 'hidden',
     position: 'absolute',
-    borderWidth: 1,
-    borderColor: '#ccc',
+    backgroundColor: '#aaa',
+  },
+  companyName: {
+    color: '#fff',
+    fontSize: 24,
+    fontWeight: 400,
+  },
+  companyLocation: {
+    color: '#fff',
+    fontSize: 16,
+    fontStyle: 'italic',
   },
   image: {
     width: '100%',
@@ -71,38 +75,41 @@ const styles = StyleSheet.create({
   overlay: {
     ...StyleSheet.absoluteFillObject,
     justifyContent: 'space-between',
-    padding: 16,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    position: 'absolute',
+    top: 0,
+    width: '100%',
+    padding: 12,
+    paddingBottom: 48
   },
   footer: {
-    flexDirection: 'row',
+    position: 'absolute',
+    bottom: 0,
+    width: '100%',
+    padding: 12,
+    paddingTop: 36,
   },
-  name: {
-    color: 'white',
-    fontSize: 32,
+  jobTitle: {
+    color: '#fff',
+    fontSize: 28,
+    fontWeight: 500,
   },
   like: {
-    borderWidth: 4,
-    borderRadius: 5, 
-    padding: 8, 
-    borderColor: '#6ee3b4',
-    color: '#6ee3b4',
+    padding: 6,
+    borderColor: '#4aa1ff',
+    color: '#4aa1ff',
     flexDirection: 'row',
     alignItems: 'center',
     columnGap: 5,
   },
   likeLabel: {
     fontSize: 32,
-    color: '#6ee3b4',
+    color: '#4aa1ff',
     fontWeight: 'bold',
   },
   nope: {
-    borderWidth: 4,
-    borderRadius: 5,
-    padding: 8,
+    padding: 6,
     borderColor: '#ec5288',
     color: '#ec5288',
     flexDirection: 'row',
