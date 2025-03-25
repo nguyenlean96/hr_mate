@@ -51,15 +51,15 @@ const Profiles: React.FC = () => {
       /**
        *  Set the remainder to infinitly loop through the profiles
        */
-      setIndex((prevIndex: number) => ((prevIndex + 1) % jobs_data.length));
+      setIndex((prevIndex: number) => ((prevIndex + 1) % Object.keys(jobs_data).length));
 
-      if (liked.has(jobs_data[index].jobview.job.listingId)) {
+      if (liked.has(jobs_data[Object.keys(jobs_data)[index]].jobview.job.listingId)) {
         if (snapPoint < 0) {
-          runOnJS(handlePressLike)(jobs_data[index].jobview.job.listingId);
+          runOnJS(handlePressLike)(jobs_data[Object.keys(jobs_data)[index]].jobview.job.listingId);
         }
       } else {
         if (snapPoint > 0) {
-          runOnJS(handlePressLike)(jobs_data[index].jobview.job.listingId);
+          runOnJS(handlePressLike)(jobs_data[Object.keys(jobs_data)[index]].jobview.job.listingId);
         }
       }
 
@@ -94,7 +94,7 @@ const Profiles: React.FC = () => {
     interpolate(translationX.value, [-deltaX / 4, 0], [1, 0])
   );
 
-  const profile = jobs_data[index];
+  const profile = jobs_data[Object.keys(jobs_data)[index]];
 
   return (
     <SafeAreaView style={styles.container}>
